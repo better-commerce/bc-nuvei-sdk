@@ -52,6 +52,21 @@ export class ChecksumUtil {
     }
 
     /**
+     * Generate checksum for getTransactionDetails request
+     */
+    static generateTransactionDetailsChecksum(merchantId: string, merchantSiteId: string, transactionId: string | undefined, clientUniqueId: string | undefined, timeStamp: string): string {
+        const params = [merchantId, merchantSiteId];
+        if (transactionId) {
+            params.push(transactionId);
+        }
+        if (clientUniqueId) {
+            params.push(clientUniqueId);
+        }
+        params.push(timeStamp);
+        return this.generateChecksum(params);
+    }
+
+    /**
      * Generate current timestamp in Nuvei format
      * @returns Timestamp string in YYYYMMDDHHmmss format
      */

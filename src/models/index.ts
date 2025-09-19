@@ -12,6 +12,7 @@ export { default as IUpdateOrderRequest } from "./request/IUpdateOrderRequest";
 export { default as IGetPaymentStatusRequest } from "./request/IGetPaymentStatusRequest";
 export { default as IRefundTransactionRequest } from "./request/IRefundTransactionRequest";
 export { default as IVoidTransactionRequest } from "./request/IVoidTransactionRequest";
+export { default as IGetTransactionDetailsRequest } from "./request/IGetTransactionDetailsRequest";
 
 // Response interfaces
 export { default as IGetSessionTokenResponse } from "./response/IGetSessionTokenResponse";
@@ -20,3 +21,4 @@ export { default as IUpdateOrderResponse } from "./response/IUpdateOrderResponse
 export { default as IGetPaymentStatusResponse } from "./response/IGetPaymentStatusResponse";
 export { default as IRefundTransactionResponse } from "./response/IRefundTransactionResponse";
 export { default as IVoidTransactionResponse } from "./response/IVoidTransactionResponse";
+export { default as IGetTransactionDetailsResponse } from "./response/IGetTransactionDetailsResponse";

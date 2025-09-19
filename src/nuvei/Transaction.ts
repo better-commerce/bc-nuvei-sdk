@@ -2,7 +2,7 @@
 import { Api } from "../api";
 import { RequestMethod } from "../constants/enums";
 import { ITransaction } from "../base/contracts/ITransaction";
-import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse } from "../models";
+import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse } from "../models";
 import NuveiEnvironment from "../base/config/NuveiEnvironment";
 import { ChecksumUtil } from "../utils/checksum";
 import { Endpoints } from "../constants/Endpoints";
@@ -184,6 +184,40 @@ export default class Transaction implements ITransaction {
             return response;
         } catch (error) {
             console.error('Error in getPaymentStatus:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Gets detailed information about a specific transaction.
+     * Can query by either transactionId or clientUniqueId.
+     * If multiple transactions share the same clientUniqueId, only the most recent is returned.
+     *
+     * @param {Object} params The query parameters
+     * @param {string} params.transactionId - The Gateway transaction ID (conditional - either this or clientUniqueId required)
+     * @param {string} params.clientUniqueId - The unique transaction ID in merchant system (conditional - either this or transactionId required)
+     * @returns {Promise<IGetTransactionDetailsResponse>} A promise resolving to the transaction details
+     */
+    async getTransactionDetails(params: { transactionId?: string; clientUniqueId?: string; }): Promise<IGetTransactionDetailsResponse> {
+        try {
+            // Validate that at least one identifier is provided
+            if (!params.transactionId && !params.clientUniqueId) {
+                throw new Error("Either transactionId or clientUniqueId must be provided");
+            }
+
+            const merchantId = NuveiEnvironment.getMerchantId();
+            const merchantSiteId = NuveiEnvironment.getMerchantSiteId();
+            const timeStamp = ChecksumUtil.getCurrentTimestamp();
+
+            const checksum = ChecksumUtil.generateTransactionDetailsChecksum(merchantId, merchantSiteId, params.transactionId, params.clientUniqueId, timeStamp);
+
+            const request: IGetTransactionDetailsRequest = { merchantId, merchantSiteId, timeStamp, checksum, ...(params.transactionId && { transactionId: params.transactionId }), ...(params.clientUniqueId && { clientUniqueId: params.clientUniqueId }) };
+
+            const response = await Api.call(Endpoints.Payment.GET_TRANSACTION_DETAILS, RequestMethod.POST, request, {}, { 'Content-Type': 'application/json' });
+
+            return response;
+        } catch (error) {
+            console.error('Error in getTransactionDetails:', error);
             throw error;
         }
     }

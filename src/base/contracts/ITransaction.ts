@@ -1,5 +1,5 @@
 
-import { IOpenOrderResponse, IUpdateOrderResponse, IGetPaymentStatusResponse, IRefundTransactionResponse, IVoidTransactionResponse, IGetSessionTokenResponse, IAddress, IUserDetails, IUrlDetails } from "../../models";
+import { IOpenOrderResponse, IUpdateOrderResponse, IGetPaymentStatusResponse, IRefundTransactionResponse, IVoidTransactionResponse, IGetSessionTokenResponse, IGetTransactionDetailsResponse, IAddress, IUserDetails, IUrlDetails } from "../../models";
 
 export interface ITransaction {
 
@@ -50,4 +50,14 @@ export interface ITransaction {
      * @returns {Promise<IGetPaymentStatusResponse>}
      */
     getDetails(data: any): any;
+
+    /**
+     * Gets detailed information about a specific transaction.
+     * Can query by either transactionId or clientUniqueId.
+     * @param params {Object} The query parameters
+     * @param params.transactionId {String} The Gateway transaction ID (conditional)
+     * @param params.clientUniqueId {String} The unique transaction ID in merchant system (conditional)
+     * @returns {Promise<IGetTransactionDetailsResponse>}
+     */
+    getTransactionDetails(params: { transactionId?: string; clientUniqueId?: string; }): Promise<IGetTransactionDetailsResponse>;
 }

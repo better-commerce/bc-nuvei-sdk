@@ -13,5 +13,6 @@ export namespace Endpoints {
         export const REFUND_TRANSACTION = "/ppp/api/refundTransaction";
         export const VOID_TRANSACTION = "/ppp/api/voidTransaction";
         export const GET_SESSION_TOKEN = "/ppp/api/getSessionToken.do";
+        export const GET_TRANSACTION_DETAILS = "/ppp/api/v1/getTransactionDetails.do";
     };
 }
