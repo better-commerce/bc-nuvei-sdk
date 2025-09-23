@@ -30,7 +30,7 @@ async function testTransactionDetails(transactionId, clientUniqueId) {
 }
 
 // Run the test
-testTransactionDetails("", "10796-4321184")
+testTransactionDetails("", "10819-4335458")
     .then(result => {
         console.log("Test completed successfully");
     })

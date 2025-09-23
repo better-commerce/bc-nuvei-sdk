@@ -200,10 +200,10 @@ export default class Transaction implements ITransaction {
      */
     async getTransactionDetails(params: { transactionId?: string; clientUniqueId?: string; }): Promise<IGetTransactionDetailsResponse> {
         try {
-            // Validate that at least one identifier is provided
-            if (!params.transactionId && !params.clientUniqueId) {
-                throw new Error("Either transactionId or clientUniqueId must be provided");
-            }
+            // // Validate that at least one identifier is provided
+            // if (!params.transactionId && !params.clientUniqueId) {
+            //     throw new Error("Either transactionId or clientUniqueId must be provided");
+            // }
 
             const merchantId = NuveiEnvironment.getMerchantId();
             const merchantSiteId = NuveiEnvironment.getMerchantSiteId();
