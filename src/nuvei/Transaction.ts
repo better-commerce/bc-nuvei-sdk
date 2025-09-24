@@ -13,6 +13,8 @@ export default class Transaction implements ITransaction {
     /**
      * Gets a session token for server-to-server API authentication.
      * This token is required for subsequent API calls in the server-to-server flow.
+     * 
+     * API Reference - https://docs.nuvei.com/api/main/indexMain_v1_0.html?json#getSessionToken
      *
      * @returns {Promise<IGetSessionTokenResponse>} A promise resolving to the session token response
      */
@@ -39,6 +41,8 @@ export default class Transaction implements ITransaction {
     /**
      * Initiates an order session for payment processing.
      * This is the first step in the payment flow.
+     * 
+     * API Reference - https://docs.nuvei.com/api/main/indexMain_v1_0.html?json#openOrder
      *
      * @param {Object} params The order parameters
      * @returns {Promise<IOpenOrderResponse>} A promise resolving to the open order response with sessionToken
@@ -65,6 +69,8 @@ export default class Transaction implements ITransaction {
 
     /**
      * Updates an existing order with new details.
+     * 
+     * API Reference - https://docs.nuvei.com/api/main/indexMain_v1_0.html?json#updateOrder
      *
      * @param {Object} params The update order parameters
      * @returns {Promise<IUpdateOrderResponse>} A promise resolving to the update order response
@@ -91,6 +97,8 @@ export default class Transaction implements ITransaction {
 
     /**
      * Refunds a transaction.
+     * 
+     * API Reference - https://docs.nuvei.com/api/main/indexMain_v1_0.html?json#refundTransaction
      *
      * @param {Object} params The refund parameters
      * @returns {Promise<IRefundTransactionResponse>} A promise resolving to the refund response
@@ -117,6 +125,8 @@ export default class Transaction implements ITransaction {
 
     /**
      * Voids a transaction.
+     * 
+     * API Reference - https://docs.nuvei.com/api/main/indexMain_v1_0.html?json#voidTransaction
      *
      * @param {Object} params The void parameters
      * @returns {Promise<IVoidTransactionResponse>} A promise resolving to the void response
@@ -164,6 +174,8 @@ export default class Transaction implements ITransaction {
 
     /**
      * Gets the payment status for a session.
+     * 
+     * API Reference - https://docs.nuvei.com/api/main/indexMain_v1_0.html?json#getPaymentStatus
      *
      * @param {string} sessionToken The session token
      * @returns {Promise<IGetPaymentStatusResponse>} A promise resolving to the payment status
@@ -192,6 +204,8 @@ export default class Transaction implements ITransaction {
      * Gets detailed information about a specific transaction.
      * Can query by either transactionId or clientUniqueId.
      * If multiple transactions share the same clientUniqueId, only the most recent is returned.
+     * 
+     * API Reference - https://docs.nuvei.com/api/main/indexMain_v1_0.html?json#getTransactionDetails
      *
      * @param {Object} params The query parameters
      * @param {string} params.transactionId - The Gateway transaction ID (conditional - either this or clientUniqueId required)
