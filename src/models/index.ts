@@ -13,6 +13,7 @@ export { default as IGetPaymentStatusRequest } from "./request/IGetPaymentStatus
 export { default as IRefundTransactionRequest } from "./request/IRefundTransactionRequest";
 export { default as IVoidTransactionRequest } from "./request/IVoidTransactionRequest";
 export { default as IGetTransactionDetailsRequest } from "./request/IGetTransactionDetailsRequest";
+export { default as IRegisterGooglePayDomainsRequest } from "./request/IRegisterGooglePayDomainsRequest";
 
 // Response interfaces
 export { default as IGetSessionTokenResponse } from "./response/IGetSessionTokenResponse";
@@ -22,3 +23,4 @@ export { default as IGetPaymentStatusResponse } from "./response/IGetPaymentStat
 export { default as IRefundTransactionResponse } from "./response/IRefundTransactionResponse";
 export { default as IVoidTransactionResponse } from "./response/IVoidTransactionResponse";
 export { default as IGetTransactionDetailsResponse } from "./response/IGetTransactionDetailsResponse";
+export { default as IRegisterGooglePayDomainsResponse } from "./response/IRegisterGooglePayDomainsResponse";

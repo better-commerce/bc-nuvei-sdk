@@ -14,5 +14,6 @@ export namespace Endpoints {
         export const VOID_TRANSACTION = "/ppp/api/voidTransaction";
         export const GET_SESSION_TOKEN = "/ppp/api/getSessionToken.do";
         export const GET_TRANSACTION_DETAILS = "/ppp/api/v1/getTransactionDetails.do";
+        export const REGISTER_GOOGLE_PAY_DOMAINS = "/ppp/api/v1/registerGooglePayDomains.do";
     };
 }

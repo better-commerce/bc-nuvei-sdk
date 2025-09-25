@@ -2,7 +2,7 @@
 import { Api } from "../api";
 import { RequestMethod } from "../constants/enums";
 import { ITransaction } from "../base/contracts/ITransaction";
-import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse } from "../models";
+import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse } from "../models";
 import NuveiEnvironment from "../base/config/NuveiEnvironment";
 import { ChecksumUtil } from "../utils/checksum";
 import { Endpoints } from "../constants/Endpoints";
@@ -204,7 +204,7 @@ export default class Transaction implements ITransaction {
      * Gets detailed information about a specific transaction.
      * Can query by either transactionId or clientUniqueId.
      * If multiple transactions share the same clientUniqueId, only the most recent is returned.
-     * 
+     *
      * API Reference - https://docs.nuvei.com/api/main/indexMain_v1_0.html?json#getTransactionDetails
      *
      * @param {Object} params The query parameters
@@ -232,6 +232,75 @@ export default class Transaction implements ITransaction {
             return response;
         } catch (error) {
             console.error('Error in getTransactionDetails:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Registers or retrieves Google Pay domains for the merchant.
+     * This endpoint is used to manage the list of domains that can process Google Pay transactions.
+     * When called without domains parameter, it returns the currently registered domains.
+     * When called with domains parameter, it registers/updates the domain list.
+     *
+     * API Reference - https://docs.nuvei.com/api/advanced/indexAdvanced.html?json#registerGooglePayDomains
+     *
+     * @param {Object} params The parameters for domain registration
+     * @param {string[]} params.domainNames - Optional array of domains to register. If not provided, returns current domains.
+     * @param {boolean} params.agreedToGooglePayTermsAndConditions - Required. Indicates merchant agreement to Google Pay terms.
+     * @returns {Promise<IRegisterGooglePayDomainsResponse>} A promise resolving to the response with domain list
+     *
+     * @example
+     * // Register new domains
+     * const result = await transaction.registerGooglePayDomains({
+     *     domainNames: ["example.com", "www.example.com", "checkout.example.com"],
+     *     agreedToGooglePayTermsAndConditions: true
+     * });
+     *
+     * @example
+     * // Get current registered domains
+     * const result = await transaction.registerGooglePayDomains({
+     *     agreedToGooglePayTermsAndConditions: true
+     * });
+     */
+    async registerGooglePayDomains(params: { domainNames?: string[]; agreedToGooglePayTermsAndConditions?: boolean; } = {}): Promise<IRegisterGooglePayDomainsResponse> {
+        try {
+            const merchantId = NuveiEnvironment.getMerchantId();
+            const merchantSiteId = NuveiEnvironment.getMerchantSiteId();
+            const clientRequestId = ChecksumUtil.generateClientRequestId();
+            const timeStamp = ChecksumUtil.getCurrentTimestamp();
+
+            // Use provided domainNames or empty array
+            const domainNames = params.domainNames || [];
+            const agreedToTerms = params.agreedToGooglePayTermsAndConditions !== undefined ? params.agreedToGooglePayTermsAndConditions : true;
+
+            // Build checksum array - convert domainNames array to concatenated string
+            const checksumParams = [
+                merchantId,
+                merchantSiteId,
+                clientRequestId,
+                domainNames.join(''),  // Concatenate domain names
+                agreedToTerms.toString(),
+                timeStamp
+                // Note: merchantSecretKey is automatically appended by generateChecksum()
+            ];
+
+            const checksum = ChecksumUtil.generateChecksum(checksumParams);
+
+            const request: IRegisterGooglePayDomainsRequest = {
+                merchantId,
+                merchantSiteId,
+                clientRequestId,
+                timeStamp,
+                checksum,
+                domainNames,  // Always include domainNames field
+                agreedToGooglePayTermsAndConditions: agreedToTerms
+            };
+
+            const response = await Api.call(Endpoints.Payment.REGISTER_GOOGLE_PAY_DOMAINS, RequestMethod.POST, request, {}, { 'Content-Type': 'application/json' });
+
+            return response;
+        } catch (error) {
+            console.error('Error in registerGooglePayDomains:', error);
             throw error;
         }
     }
