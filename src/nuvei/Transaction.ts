@@ -2,7 +2,7 @@
 import { Api } from "../api";
 import { RequestMethod } from "../constants/enums";
 import { ITransaction } from "../base/contracts/ITransaction";
-import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse } from "../models";
+import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtRequest, IGetGooglePayMerchantInfoJwtResponse } from "../models";
 import NuveiEnvironment from "../base/config/NuveiEnvironment";
 import { ChecksumUtil } from "../utils/checksum";
 import { Endpoints } from "../constants/Endpoints";
@@ -301,6 +301,46 @@ export default class Transaction implements ITransaction {
             return response;
         } catch (error) {
             console.error('Error in registerGooglePayDomains:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Gets Google Pay merchant info JWT for secure domain registration.
+     * This JWT solution allows Nuvei to dynamically enable unlimited web domains
+     * without having to register each one in Google Pay and Wallet consoles.
+     * The merchant receives a registered domain and JWT for each transaction.
+     *
+     * API Reference - https://docs.nuvei.com/api/advanced/indexAdvanced.html?json#googlePayMerchantInfoJwt
+     *
+     * @param {Object} params The parameters for getting merchant info JWT
+     * @param {string} params.sessionToken The session token from openOrder
+     * @param {string} params.merchantOrigin The merchant's domain origin
+     * @returns {Promise<IGetGooglePayMerchantInfoJwtResponse>} A promise resolving to the merchant info with JWT
+     *
+     * @example
+     * // Get merchant info JWT for Google Pay
+     * const result = await transaction.getGooglePayMerchantInfoJwt({
+     *     sessionToken: sessionToken,
+     *     merchantOrigin: "yourdomain.com"
+     * });
+     * // Use result.merchantInfo in Google Pay PaymentDataRequest:
+     * // {
+     * //   merchantName: "Your Store",
+     * //   merchantId: "BCR2DN4XXXXXXXXX",
+     * //   authJwt: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+     * //   merchantOrigin: "https://yourdomain.com"
+     * // }
+     */
+    async getGooglePayMerchantInfoJwt(params: { sessionToken: string; merchantOrigin: string; }): Promise<IGetGooglePayMerchantInfoJwtResponse> {
+        try {
+            const request: IGetGooglePayMerchantInfoJwtRequest = { sessionToken: params.sessionToken, merchantOrigin: params.merchantOrigin };
+
+            const response = await Api.call( Endpoints.Payment.GET_GOOGLE_PAY_MERCHANT_INFO_JWT, RequestMethod.GET, request, {}, { 'Content-Type': 'application/json' } );
+
+            return response;
+        } catch (error) {
+            console.error('Error in getGooglePayMerchantInfoJwt:', error);
             throw error;
         }
     }
