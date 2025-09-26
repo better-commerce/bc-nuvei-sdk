@@ -1,4 +1,4 @@
-export interface IUnregisterGooglePayDomainsResponse {
+export default interface IUnregisterGooglePayDomainsResponse {
     internalRequestId?: number;
     status: string;
     errCode?: number;

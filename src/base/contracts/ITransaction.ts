@@ -1,5 +1,5 @@
 
-import { IOpenOrderResponse, IUpdateOrderResponse, IGetPaymentStatusResponse, IRefundTransactionResponse, IVoidTransactionResponse, IGetSessionTokenResponse, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsResponse, IAddress, IUserDetails, IUrlDetails } from "../../models";
+import { IOpenOrderResponse, IUpdateOrderResponse, IGetPaymentStatusResponse, IRefundTransactionResponse, IVoidTransactionResponse, IGetSessionTokenResponse, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsResponse, IGetRegisteredGooglePayDomainsResponse, IAddress, IUserDetails, IUrlDetails } from "../../models";
 
 export interface ITransaction {
 
@@ -86,4 +86,12 @@ export interface ITransaction {
      * @returns {Promise<IUnregisterGooglePayDomainsResponse>}
      */
     unregisterGooglePayDomains(params: { domainNames: string[]; }): Promise<IUnregisterGooglePayDomainsResponse>;
+
+    /**
+     * Gets the list of registered Google Pay domains for the merchant.
+     * @param params {Object} The parameters for retrieving registered domains
+     * @param params.domainNames {String[]} Optional array of specific domains to query
+     * @returns {Promise<IGetRegisteredGooglePayDomainsResponse>}
+     */
+    getRegisteredGooglePayDomains(params?: { domainNames?: string[]; }): Promise<IGetRegisteredGooglePayDomainsResponse>;
 }

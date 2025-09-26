@@ -2,7 +2,7 @@
 import { Api } from "../api";
 import { RequestMethod } from "../constants/enums";
 import { ITransaction } from "../base/contracts/ITransaction";
-import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtRequest, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsRequest, IUnregisterGooglePayDomainsResponse } from "../models";
+import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtRequest, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsRequest, IUnregisterGooglePayDomainsResponse, IGetRegisteredGooglePayDomainsRequest, IGetRegisteredGooglePayDomainsResponse } from "../models";
 import NuveiEnvironment from "../base/config/NuveiEnvironment";
 import { ChecksumUtil } from "../utils/checksum";
 import { Endpoints } from "../constants/Endpoints";
@@ -393,26 +393,73 @@ export default class Transaction implements ITransaction {
 
             const checksum = ChecksumUtil.generateChecksum(checksumParams);
 
-            const request: IUnregisterGooglePayDomainsRequest = {
-                merchantId,
-                merchantSiteId,
-                clientRequestId,
-                domainNames: params.domainNames,
-                timeStamp,
-                checksum
-            };
+            const request: IUnregisterGooglePayDomainsRequest = { merchantId, merchantSiteId, clientRequestId, domainNames: params.domainNames, timeStamp, checksum };
 
-            const response = await Api.call(
-                Endpoints.Payment.UNREGISTER_GOOGLE_PAY_DOMAINS,
-                RequestMethod.POST,
-                request,
-                {},
-                { 'Content-Type': 'application/json' }
-            );
+            const response = await Api.call( Endpoints.Payment.UNREGISTER_GOOGLE_PAY_DOMAINS, RequestMethod.POST, request, {}, { 'Content-Type': 'application/json' } );
 
             return response;
         } catch (error) {
             console.error('Error in unregisterGooglePayDomains:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Gets the list of registered Google Pay domains for the merchant.
+     * This endpoint retrieves all domains that are currently registered for Google Pay processing.
+     *
+     * API Reference - https://docs.nuvei.com/api/advanced/indexAdvanced.html?json#getRegisteredGooglePayDomains
+     *
+     * @param {Object} params The parameters for retrieving registered domains
+     * @param {string[]} params.domainNames - Optional array of specific domains to query. If not provided, returns all registered domains.
+     * @returns {Promise<IGetRegisteredGooglePayDomainsResponse>} A promise resolving to the response with the list of registered domains
+     *
+     * @example
+     * // Get all registered domains
+     * const result = await transaction.getRegisteredGooglePayDomains();
+     * console.log('Registered domains:', result.domainNames);
+     *
+     * @example
+     * // Query specific domains
+     * const result = await transaction.getRegisteredGooglePayDomains({
+     *     domainNames: ["www.example.com", "mobile.example.com"]
+     * });
+     * console.log('Queried domains:', result.domainNames);
+     */
+    async getRegisteredGooglePayDomains(params: { domainNames?: string[]; } = {}): Promise<IGetRegisteredGooglePayDomainsResponse> {
+        try {
+            const merchantId = NuveiEnvironment.getMerchantId();
+            const merchantSiteId = NuveiEnvironment.getMerchantSiteId();
+            const clientRequestId = ChecksumUtil.generateClientRequestId();
+            const timeStamp = ChecksumUtil.getCurrentTimestamp();
+
+            // Use provided domainNames or empty array
+            const domainNames = params.domainNames || [];
+
+            // Build checksum - concatenate domainNames array to string as per API docs
+            const checksumParams = [ merchantId, merchantSiteId, clientRequestId ];
+
+            // Only add domainNames to checksum if provided
+            if (domainNames.length > 0) {
+                checksumParams.push(domainNames.join(''));  // Concatenate domain names for checksum
+            }
+
+            checksumParams.push(timeStamp);
+
+            const checksum = ChecksumUtil.generateChecksum(checksumParams);
+
+            const request: IGetRegisteredGooglePayDomainsRequest = { merchantId, merchantSiteId, clientRequestId, timeStamp, checksum };
+
+            // Only include domainNames in request if provided
+            if (domainNames.length > 0) {
+                request.domainNames = domainNames;
+            }
+
+            const response = await Api.call( Endpoints.Payment.GET_REGISTERED_GOOGLE_PAY_DOMAINS, RequestMethod.POST, request, {}, { 'Content-Type': 'application/json' } );
+
+            return response;
+        } catch (error) {
+            console.error('Error in getRegisteredGooglePayDomains:', error);
             throw error;
         }
     }
