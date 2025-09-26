@@ -1,5 +1,5 @@
 
-import { IOpenOrderResponse, IUpdateOrderResponse, IGetPaymentStatusResponse, IRefundTransactionResponse, IVoidTransactionResponse, IGetSessionTokenResponse, IGetTransactionDetailsResponse, IAddress, IUserDetails, IUrlDetails } from "../../models";
+import { IOpenOrderResponse, IUpdateOrderResponse, IGetPaymentStatusResponse, IRefundTransactionResponse, IVoidTransactionResponse, IGetSessionTokenResponse, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsResponse, IAddress, IUserDetails, IUrlDetails } from "../../models";
 
 export interface ITransaction {
 
@@ -60,4 +60,30 @@ export interface ITransaction {
      * @returns {Promise<IGetTransactionDetailsResponse>}
      */
     getTransactionDetails(params: { transactionId?: string; clientUniqueId?: string; }): Promise<IGetTransactionDetailsResponse>;
+
+    /**
+     * Registers or retrieves Google Pay domains for the merchant.
+     * @param params {Object} The parameters for domain registration
+     * @param params.domainNames {String[]} Optional array of domains to register
+     * @param params.agreedToGooglePayTermsAndConditions {Boolean} Indicates merchant agreement to Google Pay terms
+     * @returns {Promise<IRegisterGooglePayDomainsResponse>}
+     */
+    registerGooglePayDomains(params?: { domainNames?: string[]; agreedToGooglePayTermsAndConditions?: boolean; }): Promise<IRegisterGooglePayDomainsResponse>;
+
+    /**
+     * Gets Google Pay merchant info JWT for secure domain registration.
+     * @param params {Object} The parameters for getting merchant info JWT
+     * @param params.sessionToken {String} The session token from openOrder
+     * @param params.merchantOrigin {String} The merchant's domain origin
+     * @returns {Promise<IGetGooglePayMerchantInfoJwtResponse>}
+     */
+    getGooglePayMerchantInfoJwt(params: { sessionToken: string; merchantOrigin: string; }): Promise<IGetGooglePayMerchantInfoJwtResponse>;
+
+    /**
+     * Unregisters Google Pay domains for the merchant.
+     * @param params {Object} The parameters for domain unregistration
+     * @param params.domainNames {String[]} Array of domains to unregister
+     * @returns {Promise<IUnregisterGooglePayDomainsResponse>}
+     */
+    unregisterGooglePayDomains(params: { domainNames: string[]; }): Promise<IUnregisterGooglePayDomainsResponse>;
 }

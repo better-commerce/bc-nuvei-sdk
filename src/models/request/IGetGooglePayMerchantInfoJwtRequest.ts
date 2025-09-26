@@ -1,4 +1,4 @@
-export interface IGetGooglePayMerchantInfoJwtRequest {
+export default interface IGetGooglePayMerchantInfoJwtRequest {
     merchantId?: string;
     merchantSiteId?: string;
     merchantOrigin: string;

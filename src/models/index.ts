@@ -14,7 +14,8 @@ export { default as IRefundTransactionRequest } from "./request/IRefundTransacti
 export { default as IVoidTransactionRequest } from "./request/IVoidTransactionRequest";
 export { default as IGetTransactionDetailsRequest } from "./request/IGetTransactionDetailsRequest";
 export { default as IRegisterGooglePayDomainsRequest } from "./request/IRegisterGooglePayDomainsRequest";
-export { IGetGooglePayMerchantInfoJwtRequest } from "./request/IGetGooglePayMerchantInfoJwtRequest";
+export { default as IGetGooglePayMerchantInfoJwtRequest } from "./request/IGetGooglePayMerchantInfoJwtRequest";
+export { default as IUnregisterGooglePayDomainsRequest } from "./request/IUnregisterGooglePayDomainsRequest";
 
 // Response interfaces
 export { default as IGetSessionTokenResponse } from "./response/IGetSessionTokenResponse";
@@ -26,3 +27,4 @@ export { default as IVoidTransactionResponse } from "./response/IVoidTransaction
 export { default as IGetTransactionDetailsResponse } from "./response/IGetTransactionDetailsResponse";
 export { default as IRegisterGooglePayDomainsResponse } from "./response/IRegisterGooglePayDomainsResponse";
 export { IGetGooglePayMerchantInfoJwtResponse } from "./response/IGetGooglePayMerchantInfoJwtResponse";
+export { IUnregisterGooglePayDomainsResponse } from "./response/IUnregisterGooglePayDomainsResponse";

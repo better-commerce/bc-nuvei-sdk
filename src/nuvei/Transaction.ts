@@ -2,7 +2,7 @@
 import { Api } from "../api";
 import { RequestMethod } from "../constants/enums";
 import { ITransaction } from "../base/contracts/ITransaction";
-import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtRequest, IGetGooglePayMerchantInfoJwtResponse } from "../models";
+import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtRequest, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsRequest, IUnregisterGooglePayDomainsResponse } from "../models";
 import NuveiEnvironment from "../base/config/NuveiEnvironment";
 import { ChecksumUtil } from "../utils/checksum";
 import { Endpoints } from "../constants/Endpoints";
@@ -341,6 +341,78 @@ export default class Transaction implements ITransaction {
             return response;
         } catch (error) {
             console.error('Error in getGooglePayMerchantInfoJwt:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Unregisters Google Pay domains for the merchant.
+     * This endpoint removes previously registered domains from the merchant's Google Pay configuration.
+     *
+     * API Reference - https://docs.nuvei.com/api/advanced/indexAdvanced.html?json#unregisterGooglePayDomains
+     *
+     * @param {Object} params The parameters for domain unregistration
+     * @param {string[]} params.domainNames - Array of domains to unregister. Must be previously registered domains.
+     * @returns {Promise<IUnregisterGooglePayDomainsResponse>} A promise resolving to the response with unregistration status for each domain
+     *
+     * @example
+     * // Unregister specific domains
+     * const result = await transaction.unregisterGooglePayDomains({
+     *     domainNames: ["www.example.com", "mobile.example.com"]
+     * });
+     *
+     * // Check status for each domain
+     * result.domains.forEach(domain => {
+     *     if (domain.status === 'SUCCESS') {
+     *         console.log(`${domain.domainName} unregistered successfully`);
+     *     } else {
+     *         console.error(`Failed to unregister ${domain.domainName}: ${domain.reason}`);
+     *     }
+     * });
+     */
+    async unregisterGooglePayDomains(params: { domainNames: string[]; }): Promise<IUnregisterGooglePayDomainsResponse> {
+        try {
+            const merchantId = NuveiEnvironment.getMerchantId();
+            const merchantSiteId = NuveiEnvironment.getMerchantSiteId();
+            const clientRequestId = ChecksumUtil.generateClientRequestId();
+            const timeStamp = ChecksumUtil.getCurrentTimestamp();
+
+            // Validate input
+            if (!params.domainNames || params.domainNames.length === 0) {
+                throw new Error("domainNames array is required and cannot be empty");
+            }
+
+            // Build checksum - concatenate domainNames array to string as per API docs
+            const checksumParams = [
+                merchantId,
+                merchantSiteId,
+                clientRequestId,
+                params.domainNames.join(''),  // Concatenate domain names for checksum
+                timeStamp
+            ];
+
+            const checksum = ChecksumUtil.generateChecksum(checksumParams);
+
+            const request: IUnregisterGooglePayDomainsRequest = {
+                merchantId,
+                merchantSiteId,
+                clientRequestId,
+                domainNames: params.domainNames,
+                timeStamp,
+                checksum
+            };
+
+            const response = await Api.call(
+                Endpoints.Payment.UNREGISTER_GOOGLE_PAY_DOMAINS,
+                RequestMethod.POST,
+                request,
+                {},
+                { 'Content-Type': 'application/json' }
+            );
+
+            return response;
+        } catch (error) {
+            console.error('Error in unregisterGooglePayDomains:', error);
             throw error;
         }
     }
