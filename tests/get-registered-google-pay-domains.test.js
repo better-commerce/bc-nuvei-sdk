@@ -8,13 +8,13 @@ const merchantSecretKey = "5ziJ8r5W3cv7pZOf10AJ3v5AEJRZc2T11cz1L3sfyjEeJKNQNdaoG
 NuveiEnvironment.init(merchantId, merchantSiteId, merchantSecretKey, true);  // Use sandbox
 
 // Test getRegisteredGooglePayDomains API
-async function testGetRegisteredGooglePayDomains() {
+async function testGetRegisteredGooglePayDomains(domainNames = []) {
     const transaction = new Transaction();
 
     try {
         // Test 1: Get all registered domains (no filter)
         console.log("\n=== Test 1: Getting all registered domains ===");
-        const allDomainsResult = await transaction.getRegisteredGooglePayDomains();
+        const allDomainsResult = await transaction.getRegisteredGooglePayDomains({ domainNames });
 
         console.log("All Domains Response:", allDomainsResult);
 

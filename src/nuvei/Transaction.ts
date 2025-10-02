@@ -433,25 +433,18 @@ export default class Transaction implements ITransaction {
             const clientRequestId = ChecksumUtil.generateClientRequestId();
             const timeStamp = ChecksumUtil.getCurrentTimestamp();
 
-            // Use provided domainNames or empty array
-            const domainNames = params.domainNames || [];
+            // Use provided domainNames or undefined
+            const domainNames = params.domainNames;
 
-            // Build checksum - concatenate domainNames array to string as per API docs
-            const checksumParams = [ merchantId, merchantSiteId, clientRequestId ];
-
-            // Only add domainNames to checksum if provided
-            if (domainNames.length > 0) {
-                checksumParams.push(domainNames.join(''));  // Concatenate domain names for checksum
-            }
-
-            checksumParams.push(timeStamp);
+            // Build checksum - for getRegisteredGooglePayDomains, domainNames is NOT included in checksum
+            const checksumParams = [ merchantId, merchantSiteId, clientRequestId, timeStamp ];
 
             const checksum = ChecksumUtil.generateChecksum(checksumParams);
 
             const request: IGetRegisteredGooglePayDomainsRequest = { merchantId, merchantSiteId, clientRequestId, timeStamp, checksum };
 
             // Only include domainNames in request if provided
-            if (domainNames.length > 0) {
+            if (domainNames && domainNames.length > 0) {
                 request.domainNames = domainNames;
             }
 
