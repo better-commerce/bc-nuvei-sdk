@@ -18,5 +18,6 @@ export namespace Endpoints {
         export const GET_GOOGLE_PAY_MERCHANT_INFO_JWT = "/ppp/api/v1/googlePayMerchantInfoJwt.do";
         export const UNREGISTER_GOOGLE_PAY_DOMAINS = "/ppp/api/v1/unregisterGooglePayDomains.do";
         export const GET_REGISTERED_GOOGLE_PAY_DOMAINS = "/ppp/api/v1/getRegisteredGooglePayDomains.do";
+        export const APPLE_PAY_MERCHANT_VALIDATION = "/ppp/api/v1/payment/applePayMerchantValidation";
     };
 }

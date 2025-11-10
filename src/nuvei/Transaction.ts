@@ -2,8 +2,7 @@
 import { Api } from "../api";
 import { RequestMethod } from "../constants/enums";
 import { ITransaction } from "../base/contracts/ITransaction";
-import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtRequest, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsRequest, IUnregisterGooglePayDomainsResponse, IGetRegisteredGooglePayDomainsRequest, IGetRegisteredGooglePayDomainsResponse } from "../models";
-import NuveiEnvironment from "../base/config/NuveiEnvironment";
+import { IOpenOrderRequest, IOpenOrderResponse, IUpdateOrderRequest, IUpdateOrderResponse, IGetPaymentStatusRequest, IGetPaymentStatusResponse, IRefundTransactionRequest, IRefundTransactionResponse, IVoidTransactionRequest, IVoidTransactionResponse, IAddress, IUserDetails, IUrlDetails, IGetSessionTokenRequest, IGetSessionTokenResponse, IGetTransactionDetailsRequest, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsRequest, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtRequest, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsRequest, IUnregisterGooglePayDomainsResponse, IGetRegisteredGooglePayDomainsRequest, IGetRegisteredGooglePayDomainsResponse, IApplePayMerchantValidationRequest, IApplePayMerchantValidationResponse } from "../models"; import NuveiEnvironment from "../base/config/NuveiEnvironment";
 import { ChecksumUtil } from "../utils/checksum";
 import { Endpoints } from "../constants/Endpoints";
 
@@ -453,6 +452,88 @@ export default class Transaction implements ITransaction {
             return response;
         } catch (error) {
             console.error('Error in getRegisteredGooglePayDomains:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Validates Apple Pay merchant session with Nuvei.
+     * This endpoint handles the Apple Pay merchant validation process by forwarding
+     * the validation request to Nuvei, which then communicates with Apple's servers.
+     * The returned merchant session should be passed to Apple Pay's completeMerchantValidation.
+     *
+     * API Reference - https://docs.nuvei.com/api/advanced/indexAdvanced.html?json#applePayMerchantValidation
+     *
+     * @param {Object} params The parameters for Apple Pay merchant validation
+     * @param {string} params.sessionToken The session token from openOrder
+     * @param {string} params.validationURL The validation URL from Apple's onvalidatemerchant event
+     * @param {string} params.merchantName Optional merchant display name (defaults to configured name)
+     * @returns {Promise<IApplePayMerchantValidationResponse>} A promise resolving to the merchant session from Apple
+     *
+     * @example
+     * // Handle Apple Pay merchant validation
+     * const applePaySession = new ApplePaySession(3, paymentRequest);
+     *
+     * applePaySession.onvalidatemerchant = async (event) => {
+     *     const result = await transaction.applePayMerchantValidation({
+     *         sessionToken: sessionToken,
+     *         validationURL: event.validationURL,
+     *         merchantName: "My Store"
+     *     });
+     *
+     *     if (result.merchantSession) {
+     *         applePaySession.completeMerchantValidation(result.merchantSession);
+     *     } else {
+     *         applePaySession.abort();
+     *     }
+     * };
+     */
+    async applePayMerchantValidation(params: { sessionToken: string; validationURL: string; merchantName?: string; }): Promise<IApplePayMerchantValidationResponse> {
+        try {
+            const merchantId = NuveiEnvironment.getMerchantId();
+            const merchantSiteId = NuveiEnvironment.getMerchantSiteId();
+            const clientRequestId = ChecksumUtil.generateClientRequestId();
+            const timeStamp = ChecksumUtil.getCurrentTimestamp();
+
+            // Build checksum - based on typical Nuvei patterns for similar endpoints
+            // The checksum should include: merchantId, merchantSiteId, clientRequestId, sessionToken, validationURL, timeStamp
+            const checksumParams = [
+                merchantId,
+                merchantSiteId,
+                clientRequestId,
+                params.sessionToken,
+                params.validationURL,
+                timeStamp
+            ];
+
+            const checksum = ChecksumUtil.generateChecksum(checksumParams);
+
+            const request: IApplePayMerchantValidationRequest = {
+                sessionToken: params.sessionToken,
+                merchantId,
+                merchantSiteId,
+                validationURL: params.validationURL,
+                clientRequestId,
+                timeStamp,
+                checksum
+            };
+
+            // Add optional merchantName if provided
+            if (params.merchantName) {
+                request.merchantName = params.merchantName;
+            }
+
+            const response = await Api.call(
+                Endpoints.Payment.APPLE_PAY_MERCHANT_VALIDATION,
+                RequestMethod.POST,
+                request,
+                {},
+                { 'Content-Type': 'application/json' }
+            );
+
+            return response;
+        } catch (error) {
+            console.error('Error in applePayMerchantValidation:', error);
             throw error;
         }
     }

@@ -17,6 +17,7 @@ export { default as IRegisterGooglePayDomainsRequest } from "./request/IRegister
 export { default as IGetGooglePayMerchantInfoJwtRequest } from "./request/IGetGooglePayMerchantInfoJwtRequest";
 export { default as IUnregisterGooglePayDomainsRequest } from "./request/IUnregisterGooglePayDomainsRequest";
 export { default as IGetRegisteredGooglePayDomainsRequest } from "./request/IGetRegisteredGooglePayDomainsRequest";
+export { IApplePayMerchantValidationRequest } from "./request/IApplePayMerchantValidationRequest";
 
 // Response interfaces
 export { default as IGetSessionTokenResponse } from "./response/IGetSessionTokenResponse";
@@ -30,3 +31,4 @@ export { default as IRegisterGooglePayDomainsResponse } from "./response/IRegist
 export { default as IGetGooglePayMerchantInfoJwtResponse } from "./response/IGetGooglePayMerchantInfoJwtResponse";
 export { default as IUnregisterGooglePayDomainsResponse } from "./response/IUnregisterGooglePayDomainsResponse";
 export { default as IGetRegisteredGooglePayDomainsResponse } from "./response/IGetRegisteredGooglePayDomainsResponse";
+export { IApplePayMerchantValidationResponse } from "./response/IApplePayMerchantValidationResponse";

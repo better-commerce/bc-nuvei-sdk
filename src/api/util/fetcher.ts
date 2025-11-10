@@ -68,6 +68,8 @@ Object.freeze(axiosInstance)
  * @returns {Promise<object | { hasError: true, error: any }>} - A promise that resolves to the response data or an object with an error property.
  */
 const fetcher = async ({ url = '', method = 'post', data = {}, params = {}, headers = {}, cookies = {}, baseUrl = "", }: any) => {
+    const extras = NuveiEnvironment.getExtras();
+    const logActivity: any = extras?.logActivity;
     const computedUrl = new URL(url, baseUrl || NuveiEnvironment.getBaseUrl());
     const config: any = {
         method: method,
@@ -82,13 +84,25 @@ const fetcher = async ({ url = '', method = 'post', data = {}, params = {}, head
     if (Object.keys(data).length) {
         config.data = data;
     }
-    console.log({config})
+    console.log({ config })
+    if (logActivity) {
+        logActivity({
+            data: { request: { ...config } },
+            message: `NuveiSDK Request - ${computedUrl.href}`,
+        });
+    }
     try {
         const response = await axiosInstance(config);
 
         let responseCode = response.status;
         let responseBody = response.data;
         if (responseCode >= 200 && responseCode < 300) {
+            if (logActivity) {
+                logActivity({
+                    data: { response: responseBody },
+                    message: `NuveiSDK Response - ${computedUrl.href}`,
+                });
+            }
             return responseBody;
         } else {
             let status = undefined;
@@ -107,6 +121,13 @@ const fetcher = async ({ url = '', method = 'post', data = {}, params = {}, head
                 if ("error_message" in responseBody != undefined) {
                     errorMessage = responseBody.error_message;
                 }
+            }
+
+            if (logActivity) {
+                logActivity({
+                    data: { error: { responseCode, status, errorCode, errorMessage } },
+                    message: `NuveiSDK Error - ${computedUrl.href}`,
+                });
             }
             switch (responseCode) {
                 case 400:
@@ -148,6 +169,13 @@ const fetcher = async ({ url = '', method = 'post', data = {}, params = {}, head
 
             // Something happened in setting up the request that triggered an Error
             console.log('Error: ' + error.message);
+        }
+
+        if (logActivity) {
+            logActivity({
+                data: { error: { ... errorData } },
+                message: `NuveiSDK Error - ${computedUrl.href}`,
+            });
         }
 
         return { hasError: true, error: errorData };

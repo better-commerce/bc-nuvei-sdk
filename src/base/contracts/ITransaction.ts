@@ -1,5 +1,5 @@
 
-import { IOpenOrderResponse, IUpdateOrderResponse, IGetPaymentStatusResponse, IRefundTransactionResponse, IVoidTransactionResponse, IGetSessionTokenResponse, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsResponse, IGetRegisteredGooglePayDomainsResponse, IAddress, IUserDetails, IUrlDetails } from "../../models";
+import { IOpenOrderResponse, IUpdateOrderResponse, IGetPaymentStatusResponse, IRefundTransactionResponse, IVoidTransactionResponse, IGetSessionTokenResponse, IGetTransactionDetailsResponse, IRegisterGooglePayDomainsResponse, IGetGooglePayMerchantInfoJwtResponse, IUnregisterGooglePayDomainsResponse, IGetRegisteredGooglePayDomainsResponse, IApplePayMerchantValidationResponse, IAddress, IUserDetails, IUrlDetails } from "../../models";
 
 export interface ITransaction {
 
@@ -94,4 +94,14 @@ export interface ITransaction {
      * @returns {Promise<IGetRegisteredGooglePayDomainsResponse>}
      */
     getRegisteredGooglePayDomains(params?: { domainNames?: string[]; }): Promise<IGetRegisteredGooglePayDomainsResponse>;
+
+    /**
+     * Validates Apple Pay merchant session with Nuvei.
+     * @param params {Object} The parameters for Apple Pay merchant validation
+     * @param params.sessionToken {String} The session token from openOrder
+     * @param params.validationURL {String} The validation URL from Apple's onvalidatemerchant event
+     * @param params.merchantName {String} Optional merchant display name
+     * @returns {Promise<IApplePayMerchantValidationResponse>}
+     */
+    applePayMerchantValidation(params: { sessionToken: string; validationURL: string; merchantName?: string; }): Promise<IApplePayMerchantValidationResponse>;
 }
